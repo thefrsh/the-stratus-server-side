@@ -1,1 +1,1 @@
-# the-stratus-server-side
+# Project of instant messenger for Android system. Server side.
