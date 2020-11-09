@@ -2,6 +2,7 @@ package io.github.thefrsh.stratus.configuration;
 
 import io.github.thefrsh.stratus.security.UserDetailsJpaService;
 import io.github.thefrsh.stratus.security.filter.JwtUsernamePasswordAuthenticationFilter;
+import io.github.thefrsh.stratus.security.filter.JwtVerifyFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -21,8 +22,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
     private final UserDetailsJpaService userDetailsJpaService;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${jwt.secret}")
+    @Value("${spring.security.jwt.secret}")
     private String jwtSecret;
+
+    @Value("${spring.security.jwt.expiration-days}")
+    private int tokenExpirationTimeInDays;
 
     @Autowired
     public SecurityConfiguration(UserDetailsJpaService userDetailsJpaService, PasswordEncoder passwordEncoder)
@@ -37,7 +41,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
         http.csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilter(new JwtUsernamePasswordAuthenticationFilter(authenticationManager(), jwtSecret))
+                .addFilter(new JwtUsernamePasswordAuthenticationFilter(authenticationManager(), jwtSecret,
+                        tokenExpirationTimeInDays))
+                .addFilterAfter(new JwtVerifyFilter(jwtSecret), JwtUsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .anyRequest()
                 .authenticated();

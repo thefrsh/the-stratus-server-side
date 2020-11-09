@@ -4,10 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.thefrsh.stratus.security.TokenResponse;
 import io.github.thefrsh.stratus.security.UserLoginCredentials;
 import io.github.thefrsh.stratus.troubleshooting.ApiError;
-import io.github.thefrsh.stratus.troubleshooting.exception.RequestBodyException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,11 +24,15 @@ public class JwtUsernamePasswordAuthenticationFilter extends UsernamePasswordAut
     private final AuthenticationManager authenticationManager;
     private final String jwtSecret;
     private final ObjectMapper objectMapper;
+    private final int tokenExpirationTimeInDays;
 
-    public JwtUsernamePasswordAuthenticationFilter(AuthenticationManager authenticationManager, String jwtSecret)
+    public JwtUsernamePasswordAuthenticationFilter(AuthenticationManager authenticationManager, String jwtSecret,
+                                                   int tokenExpirationTimeInDays)
     {
         this.authenticationManager = authenticationManager;
         this.jwtSecret = jwtSecret;
+        this.tokenExpirationTimeInDays = tokenExpirationTimeInDays;
+
         this.objectMapper = new ObjectMapper();
     }
 
@@ -40,30 +42,29 @@ public class JwtUsernamePasswordAuthenticationFilter extends UsernamePasswordAut
     {
         try
         {
-            var userCredentials = objectMapper.readValue(request.getReader(), UserLoginCredentials.class);
+            var loginCredentials = objectMapper.readValue(request.getReader(), UserLoginCredentials.class);
 
             var authentication = new UsernamePasswordAuthenticationToken(
-                    userCredentials.getUsername(), userCredentials.getPassword()
+                    loginCredentials.getUsername(), loginCredentials.getPassword()
             );
 
             return authenticationManager.authenticate(authentication);
         }
-        catch (IOException e)
+        catch (IOException exception)
         {
             var apiError = ApiError.builder()
                     .message("Incorrect body format, please provide username and password")
                     .status(HttpServletResponse.SC_BAD_REQUEST)
                     .build();
 
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-
             try
             {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 objectMapper.writeValue(response.getOutputStream(), apiError);
             }
-            catch (IOException exception)
+            catch (IOException e)
             {
-                throw new RuntimeException(exception);
+                throw new RuntimeException(e);
             }
         }
 
@@ -77,13 +78,11 @@ public class JwtUsernamePasswordAuthenticationFilter extends UsernamePasswordAut
         var jwt = Jwts.builder()
                 .setSubject(authResult.getName())
                 .setIssuedAt(new Date())
-                .setExpiration(java.sql.Date.valueOf(LocalDate.now().plusDays(2)))
+                .setExpiration(java.sql.Date.valueOf(LocalDate.now().plusDays(tokenExpirationTimeInDays)))
                 .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
                 .compact();
 
-        var tokenResponse = new TokenResponse(jwt);
-
-        objectMapper.writeValue(response.getOutputStream(), tokenResponse);
+        objectMapper.writeValue(response.getOutputStream(), new TokenResponse(jwt));
     }
 
     @Override
