@@ -15,45 +15,36 @@ import java.util.Objects;
 @RestControllerAdvice
 public class RestControllerExceptionHandler
 {
-    @ExceptionHandler({RequestBodyException.class})
-    public ResponseEntity<ApiError> handleBadRequestsException(Exception e)
-    {
-        var apiError = ApiError.builder()
-                .message(e.getMessage())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .build();
-
-        var headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        return new ResponseEntity<>(apiError, headers, HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleMethodArgumentNotValidException(MethodArgumentNotValidException e)
     {
-        var apiError = ApiError.builder()
-                .message(Objects.requireNonNull(e.getBindingResult().getFieldError()).getDefaultMessage())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .build();
-
-        var headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        return new ResponseEntity<>(apiError, headers, HttpStatus.BAD_REQUEST);
+        return handleCommonError(HttpStatus.BAD_REQUEST, Objects.requireNonNull(e.getBindingResult()
+                .getFieldError())
+                .getDefaultMessage());
     }
 
-    @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<ApiError> handlerUserAlreadyExistsException(Exception e)
+    @ExceptionHandler({RequestBodyException.class})
+    public ResponseEntity<ApiError> handleBadRequestsException(Exception e)
+    {
+        return handleCommonError(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler({UserAlreadyExistsException.class})
+    public ResponseEntity<ApiError> handleConflictExceptions(Exception e)
+    {
+        return handleCommonError(HttpStatus.CONFLICT, e.getMessage());
+    }
+
+    private ResponseEntity<ApiError> handleCommonError(HttpStatus status, String message)
     {
         var apiError = ApiError.builder()
-                .message(e.getMessage())
-                .status(HttpStatus.CONFLICT.value())
+                .message(message)
+                .status(status.value())
                 .build();
 
         var headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        return new ResponseEntity<>(apiError, headers, HttpStatus.CONFLICT);
+        return new ResponseEntity<>(apiError, headers, status);
     }
 }
