@@ -1,11 +1,13 @@
 package io.github.thefrsh.stratus.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.thefrsh.stratus.security.TokenResponse;
-import io.github.thefrsh.stratus.security.UserLoginCredentials;
+import io.github.thefrsh.stratus.transfer.TokenTransfer;
+import io.github.thefrsh.stratus.transfer.LoginCredentialsTransfer;
 import io.github.thefrsh.stratus.troubleshooting.ApiError;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -38,11 +40,10 @@ public class JwtUsernamePasswordAuthenticationFilter extends UsernamePasswordAut
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
-            throws AuthenticationException
     {
         try
         {
-            var loginCredentials = objectMapper.readValue(request.getReader(), UserLoginCredentials.class);
+            var loginCredentials = objectMapper.readValue(request.getReader(), LoginCredentialsTransfer.class);
 
             var authentication = new UsernamePasswordAuthenticationToken(
                     loginCredentials.getUsername(), loginCredentials.getPassword()
@@ -60,6 +61,7 @@ public class JwtUsernamePasswordAuthenticationFilter extends UsernamePasswordAut
             try
             {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
                 objectMapper.writeValue(response.getOutputStream(), apiError);
             }
             catch (IOException e)
@@ -82,7 +84,8 @@ public class JwtUsernamePasswordAuthenticationFilter extends UsernamePasswordAut
                 .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
                 .compact();
 
-        objectMapper.writeValue(response.getOutputStream(), new TokenResponse(jwt));
+        response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        objectMapper.writeValue(response.getOutputStream(), new TokenTransfer(jwt));
     }
 
     @Override
@@ -95,6 +98,7 @@ public class JwtUsernamePasswordAuthenticationFilter extends UsernamePasswordAut
                 .build();
 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         objectMapper.writeValue(response.getOutputStream(), apiError);
     }
 }

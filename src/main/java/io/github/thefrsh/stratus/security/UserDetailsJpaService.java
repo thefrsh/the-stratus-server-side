@@ -22,7 +22,7 @@ public class UserDetailsJpaService implements UserDetailsService
 
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
+    public UserDetails loadUserByUsername(String username)
     {
         return repository.findByUsername(username)
                 .map(UserDetailsJpaAdapter::new)
