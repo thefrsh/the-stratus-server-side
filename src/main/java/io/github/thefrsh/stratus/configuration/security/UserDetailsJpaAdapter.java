@@ -1,4 +1,4 @@
-package io.github.thefrsh.stratus.security;
+package io.github.thefrsh.stratus.configuration.security;
 
 import io.github.thefrsh.stratus.model.User;
 import org.springframework.security.core.GrantedAuthority;

@@ -1,8 +1,7 @@
-package io.github.thefrsh.stratus.configuration;
+package io.github.thefrsh.stratus.configuration.security;
 
-import io.github.thefrsh.stratus.security.UserDetailsJpaService;
-import io.github.thefrsh.stratus.security.filter.JwtUsernamePasswordAuthenticationFilter;
-import io.github.thefrsh.stratus.security.filter.JwtVerifyFilter;
+import io.github.thefrsh.stratus.configuration.security.filter.JwtUsernamePasswordAuthenticationFilter;
+import io.github.thefrsh.stratus.configuration.security.filter.JwtVerifyFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -44,7 +43,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
                 .and()
                 .addFilter(new JwtUsernamePasswordAuthenticationFilter(authenticationManager(), jwtSecret,
                         tokenExpirationTimeInDays))
-                .addFilterAfter(new JwtVerifyFilter(jwtSecret), JwtUsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(new JwtVerifyFilter(jwtSecret, userDetailsJpaService),
+                        JwtUsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .anyRequest()
                 .authenticated();
@@ -59,7 +59,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
     @Override
     public void configure(WebSecurity web)
     {
-        web.ignoring().antMatchers("/register");
+        web.ignoring().antMatchers("/register", "/h2-console/**");
     }
 
     @Bean

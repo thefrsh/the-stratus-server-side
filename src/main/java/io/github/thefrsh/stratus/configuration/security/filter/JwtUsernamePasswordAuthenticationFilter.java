@@ -1,4 +1,4 @@
-package io.github.thefrsh.stratus.security.filter;
+package io.github.thefrsh.stratus.configuration.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.thefrsh.stratus.transfer.TokenTransfer;

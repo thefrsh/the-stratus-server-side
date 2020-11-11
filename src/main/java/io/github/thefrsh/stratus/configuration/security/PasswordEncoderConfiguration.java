@@ -1,4 +1,4 @@
-package io.github.thefrsh.stratus.configuration;
+package io.github.thefrsh.stratus.configuration.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

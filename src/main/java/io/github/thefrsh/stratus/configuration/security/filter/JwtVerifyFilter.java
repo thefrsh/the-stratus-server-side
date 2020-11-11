@@ -1,4 +1,4 @@
-package io.github.thefrsh.stratus.security.filter;
+package io.github.thefrsh.stratus.configuration.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.thefrsh.stratus.troubleshooting.ApiError;
@@ -9,6 +9,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -22,12 +24,15 @@ public class JwtVerifyFilter extends OncePerRequestFilter
     private static final String BEARER_PREFIX = "Bearer ";
     private static final String EMPTY_STRING = "";
 
-    private final ObjectMapper objectMapper;
     private final String jwtSecret;
+    private final UserDetailsService service;
+    private final ObjectMapper objectMapper;
 
-    public JwtVerifyFilter(String jwtSecret)
+    public JwtVerifyFilter(String jwtSecret, UserDetailsService service)
     {
         this.jwtSecret = jwtSecret;
+        this.service = service;
+
         this.objectMapper = new ObjectMapper();
     }
 
@@ -53,11 +58,13 @@ public class JwtVerifyFilter extends OncePerRequestFilter
 
             var username = claimsJws.getBody().getSubject();
 
+            service.loadUserByUsername(username);
+
             var authenticationToken = new UsernamePasswordAuthenticationToken(username, null, null);
 
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         }
-        catch (JwtException e)
+        catch (JwtException | UsernameNotFoundException e)
         {
             var apiError = ApiError.builder()
                     .message(e.getMessage())
