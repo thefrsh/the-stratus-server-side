@@ -26,13 +26,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LoginTest
 {
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Autowired
     private MockMvc mockMvc;
 
-    public ObjectMapper objectMapper = new ObjectMapper();
-
     @Test
-    public void loginTest_existingUser_shouldReturnOkWithToken() throws Exception
+    public void loginAttempt_existingUser_shouldReturnOkWithToken() throws Exception
     {
         var loginCredentials = LoginCredentialsTransfer.builder()
                 .username("test")
@@ -51,7 +51,7 @@ public class LoginTest
     }
 
     @Test
-    public void loginTest_nonExistingUser_shouldReturnUnauthorized() throws Exception
+    public void loginAttempt_nonExistingUser_shouldReturnUnauthorized() throws Exception
     {
         var loginCredentials = LoginCredentialsTransfer.builder()
                 .username("non-existing")
@@ -65,7 +65,7 @@ public class LoginTest
     }
 
     @Test
-    public void loginTest_incorrectBody_shouldReturnBadRequest() throws Exception
+    public void loginAttempt_incorrectBody_shouldReturnBadRequest() throws Exception
     {
         mockMvc.perform(post("/login")
                 .contentType(MediaType.APPLICATION_JSON)

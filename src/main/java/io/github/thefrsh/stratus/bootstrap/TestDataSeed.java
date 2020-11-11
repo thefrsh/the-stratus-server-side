@@ -1,4 +1,4 @@
-package io.github.thefrsh.stratus.configuration.test.bootstrap;
+package io.github.thefrsh.stratus.bootstrap;
 
 import io.github.thefrsh.stratus.model.User;
 import io.github.thefrsh.stratus.repository.UserJpaRepository;
