@@ -59,13 +59,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
     @Override
     public void configure(WebSecurity web)
     {
-        web.ignoring().antMatchers("/register", "/h2-console/**");
+        web.ignoring().antMatchers("/register", "/h2-console/**", "/websocket");
     }
 
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider()
     {
-        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+        var daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
         daoAuthenticationProvider.setUserDetailsService(userDetailsJpaService);
         return daoAuthenticationProvider;
