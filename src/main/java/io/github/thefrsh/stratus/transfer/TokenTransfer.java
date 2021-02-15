@@ -11,5 +11,6 @@ import lombok.Setter;
 @Setter
 public class TokenTransfer
 {
+    private Long id;
     private String token;
 }
