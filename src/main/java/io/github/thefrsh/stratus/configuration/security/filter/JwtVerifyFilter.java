@@ -7,6 +7,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -37,8 +38,9 @@ public class JwtVerifyFilter extends OncePerRequestFilter
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
-                                    FilterChain filterChain) throws ServletException, IOException
+    protected void doFilterInternal(HttpServletRequest httpServletRequest,
+                                    @NonNull HttpServletResponse httpServletResponse,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException
     {
         var authorizationHeader = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
 
@@ -57,12 +59,15 @@ public class JwtVerifyFilter extends OncePerRequestFilter
                     .parseClaimsJws(jwt);
 
             var username = claimsJws.getBody().getSubject();
+            var userId = Long.parseLong(claimsJws.getBody().getId());
 
             service.loadUserByUsername(username);
 
-            var authenticationToken = new UsernamePasswordAuthenticationToken(username, null, null);
+            var authenticationToken = new UsernamePasswordAuthenticationToken(username, userId, null);
 
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+            filterChain.doFilter(httpServletRequest, httpServletResponse);
         }
         catch (JwtException | UsernameNotFoundException e)
         {
@@ -74,9 +79,6 @@ public class JwtVerifyFilter extends OncePerRequestFilter
             httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             httpServletResponse.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
             objectMapper.writeValue(httpServletResponse.getOutputStream(), apiError);
-            return;
         }
-
-        filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
 }

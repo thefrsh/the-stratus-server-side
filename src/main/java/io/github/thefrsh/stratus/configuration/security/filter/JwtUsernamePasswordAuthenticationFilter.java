@@ -1,9 +1,11 @@
 package io.github.thefrsh.stratus.configuration.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.thefrsh.stratus.configuration.security.UserDetailsJpaAdapter;
 import io.github.thefrsh.stratus.transfer.TokenTransfer;
 import io.github.thefrsh.stratus.transfer.LoginCredentialsTransfer;
 import io.github.thefrsh.stratus.troubleshooting.ApiError;
+import io.github.thefrsh.stratus.troubleshooting.exception.AuthenticationRuntimeException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.http.HttpHeaders;
@@ -66,7 +68,7 @@ public class JwtUsernamePasswordAuthenticationFilter extends UsernamePasswordAut
             }
             catch (IOException e)
             {
-                throw new RuntimeException(e);
+                throw new AuthenticationRuntimeException(e);
             }
         }
 
@@ -77,15 +79,18 @@ public class JwtUsernamePasswordAuthenticationFilter extends UsernamePasswordAut
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
                                             Authentication authResult) throws IOException
     {
+        var userDetails = (UserDetailsJpaAdapter) authResult.getPrincipal();
+
         var jwt = Jwts.builder()
                 .setSubject(authResult.getName())
+                .setId(Long.toString(userDetails.getId()))
                 .setIssuedAt(new Date())
                 .setExpiration(java.sql.Date.valueOf(LocalDate.now().plusDays(tokenExpirationTimeInDays)))
                 .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
                 .compact();
 
         response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        objectMapper.writeValue(response.getOutputStream(), new TokenTransfer(jwt));
+        objectMapper.writeValue(response.getOutputStream(), new TokenTransfer(userDetails.getId(), jwt));
     }
 
     @Override

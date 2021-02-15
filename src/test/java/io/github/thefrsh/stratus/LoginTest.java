@@ -47,7 +47,10 @@ public class LoginTest
                 .getResponse()
                 .getContentAsString();
 
-        assertNotNull(objectMapper.readValue(json, TokenTransfer.class).getToken());
+        var tokenTransfer = objectMapper.readValue(json, TokenTransfer.class);
+
+        assertNotNull(tokenTransfer.getId());
+        assertNotNull(tokenTransfer.getToken());
     }
 
     @Test
