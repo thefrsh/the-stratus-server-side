@@ -1,18 +1,18 @@
 package io.github.thefrsh.stratus.configuration.security.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.thefrsh.stratus.troubleshooting.ApiError;
+import io.github.thefrsh.stratus.troubleshooting.resolving.ServletExceptionResolver;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -25,24 +25,22 @@ public class JwtVerifyFilter extends OncePerRequestFilter
     private static final String BEARER_PREFIX = "Bearer ";
     private static final String EMPTY_STRING = "";
 
-    private final String jwtSecret;
     private final UserDetailsService service;
-    private final ObjectMapper objectMapper;
+    private final ServletExceptionResolver resolver;
+    private final String jwtSecret;
 
-    public JwtVerifyFilter(String jwtSecret, UserDetailsService service)
+    public JwtVerifyFilter(UserDetailsService service, ServletExceptionResolver resolver, String jwtSecret)
     {
-        this.jwtSecret = jwtSecret;
         this.service = service;
-
-        this.objectMapper = new ObjectMapper();
+        this.resolver = resolver;
+        this.jwtSecret = jwtSecret;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest httpServletRequest,
-                                    @NonNull HttpServletResponse httpServletResponse,
+    protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException
     {
-        var authorizationHeader = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        var authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         try
         {
@@ -67,18 +65,12 @@ public class JwtVerifyFilter extends OncePerRequestFilter
 
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-            filterChain.doFilter(httpServletRequest, httpServletResponse);
+            filterChain.doFilter(request, response);
         }
         catch (JwtException | UsernameNotFoundException e)
         {
-            var apiError = ApiError.builder()
-                    .message(e.getMessage())
-                    .status(HttpServletResponse.SC_UNAUTHORIZED)
-                    .build();
-
-            httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            httpServletResponse.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-            objectMapper.writeValue(httpServletResponse.getOutputStream(), apiError);
+            resolver.resolveException(request, response, new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    e.getMessage()));
         }
     }
 }
