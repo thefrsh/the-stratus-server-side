@@ -1,39 +1,47 @@
 package io.github.thefrsh.stratus;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.thefrsh.stratus.transfer.RegisterCredentialsTransfer;
-import io.github.thefrsh.stratus.transfer.UserTransfer;
+import io.github.thefrsh.stratus.repository.UserJpaRepository;
+import io.github.thefrsh.stratus.transfer.request.RegisterCredentialsRequest;
+import io.github.thefrsh.stratus.transfer.response.UserResponse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.junit.Assert.*;
 
+@Transactional
 @AutoConfigureMockMvc
-@RunWith(SpringRunner.class)
-@ActiveProfiles({"default", "test"})
-@PropertySource("classpath:application-test.properties")
+@AutoConfigureDataJpa
+@RunWith(value = SpringRunner.class)
+@AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class RegisterTest
 {
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
+
+    @Autowired
+    private UserJpaRepository userJpaRepository;
 
     @Test
     public void registerAttempt_correctCredentials_shouldReturnCreatedAndUserTransfer() throws Exception
     {
-        var registerCredentials = RegisterCredentialsTransfer.builder()
+        var registerCredentials = RegisterCredentialsRequest.builder()
                 .username("newuser")
                 .password("Password1")
                 .email("newuser@newuser.com")
@@ -47,10 +55,11 @@ public class RegisterTest
                 .getResponse()
                 .getContentAsString();
 
-        var userTransfer = objectMapper.readValue(json, UserTransfer.class);
+        var userTransfer = objectMapper.readValue(json, UserResponse.class);
 
         assertNotNull(userTransfer.getId());
         assertEquals("newuser", userTransfer.getUsername());
+        assertTrue(userJpaRepository.existsById(userTransfer.getId()));
     }
 
     @Test
@@ -65,7 +74,7 @@ public class RegisterTest
     @Test
     public void registerAttempt_blanksInUsername_shouldReturnBadRequest() throws Exception
     {
-        var registerCredentials = RegisterCredentialsTransfer.builder()
+        var registerCredentials = RegisterCredentialsRequest.builder()
                 .username("newuser   ")
                 .password("Password1")
                 .email("newuser@newuser.com")
@@ -80,7 +89,7 @@ public class RegisterTest
     @Test
     public void registerAttempt_passwordTooShort_shouldReturnBadRequest() throws Exception
     {
-        var registerCredentials = RegisterCredentialsTransfer.builder()
+        var registerCredentials = RegisterCredentialsRequest.builder()
                 .username("newuser")
                 .password("Pass1")
                 .email("newuser@newuser.com")
@@ -95,7 +104,7 @@ public class RegisterTest
     @Test
     public void registerAttempt_passwordNotContainingDigit_shouldReturnBadRequest() throws Exception
     {
-        var registerCredentials = RegisterCredentialsTransfer.builder()
+        var registerCredentials = RegisterCredentialsRequest.builder()
                 .username("newuser")
                 .password("Password")
                 .email("newuser@newuser.com")
@@ -110,7 +119,7 @@ public class RegisterTest
     @Test
     public void registerAttempt_passwordNotContainingUpperLetter_shouldReturnBadRequest() throws Exception
     {
-        var registerCredentials = RegisterCredentialsTransfer.builder()
+        var registerCredentials = RegisterCredentialsRequest.builder()
                 .username("newuser")
                 .password("password1")
                 .email("newuser@newuser.com")
@@ -125,7 +134,7 @@ public class RegisterTest
     @Test
     public void registerAttempt_incorrectEmailAddressPattern_shouldReturnBadRequest() throws Exception
     {
-        var registerCredentials = RegisterCredentialsTransfer.builder()
+        var registerCredentials = RegisterCredentialsRequest.builder()
                 .username("newuser")
                 .password("Password1")
                 .email("newuser.newuser.com")
@@ -140,7 +149,7 @@ public class RegisterTest
     @Test
     public void registerAttempt_usernameIsNotAvailable_shouldReturnConflict() throws Exception
     {
-        var firstUser = RegisterCredentialsTransfer.builder()
+        var firstUser = RegisterCredentialsRequest.builder()
                 .username("usernameNotAvailable")
                 .password("Password1")
                 .email("usernameNot@available.com")
@@ -151,7 +160,7 @@ public class RegisterTest
                 .content(objectMapper.writeValueAsString(firstUser)))
                 .andExpect(status().isCreated());
 
-        var secondUser = RegisterCredentialsTransfer.builder()
+        var secondUser = RegisterCredentialsRequest.builder()
                 .username("usernameNotAvailable")
                 .password("Password1")
                 .email("availableEmail@available.com")
@@ -166,7 +175,7 @@ public class RegisterTest
     @Test
     public void registerAttempt_emailIsNotAvailable_shouldReturnConflict() throws Exception
     {
-        var firstUser = RegisterCredentialsTransfer.builder()
+        var firstUser = RegisterCredentialsRequest.builder()
                 .username("availableUsername")
                 .password("Password1")
                 .email("notAvailable@email.com")
@@ -177,7 +186,7 @@ public class RegisterTest
                 .content(objectMapper.writeValueAsString(firstUser)))
                 .andExpect(status().isCreated());
 
-        var secondUser = RegisterCredentialsTransfer.builder()
+        var secondUser = RegisterCredentialsRequest.builder()
                 .username("availableUsername2")
                 .password("Password1")
                 .email("notAvailable@email.com")

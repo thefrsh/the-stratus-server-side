@@ -1,9 +1,10 @@
-package io.github.thefrsh.stratus.service;
+package io.github.thefrsh.stratus.service.implementation;
 
 import io.github.thefrsh.stratus.model.User;
 import io.github.thefrsh.stratus.repository.UserJpaRepository;
-import io.github.thefrsh.stratus.transfer.RegisterCredentialsTransfer;
-import io.github.thefrsh.stratus.transfer.UserTransfer;
+import io.github.thefrsh.stratus.service.RegisterService;
+import io.github.thefrsh.stratus.transfer.request.RegisterCredentialsRequest;
+import io.github.thefrsh.stratus.transfer.response.UserResponse;
 import io.github.thefrsh.stratus.troubleshooting.exception.UserAlreadyExistsException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class RegisterServiceImpl implements RegisterService
 
     @Override
     @Transactional
-    public UserTransfer register(RegisterCredentialsTransfer credentials)
+    public UserResponse register(RegisterCredentialsRequest credentials)
     {
         repository.findByUsernameOrEmail(credentials.getUsername(), credentials.getEmail()).ifPresent(u ->
         {
@@ -52,6 +53,6 @@ public class RegisterServiceImpl implements RegisterService
 
         var savedUser = repository.save(user);
 
-        return modelMapper.map(savedUser, UserTransfer.class);
+        return modelMapper.map(savedUser, UserResponse.class);
     }
 }

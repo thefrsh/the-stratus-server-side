@@ -1,4 +1,4 @@
-package io.github.thefrsh.stratus.transfer;
+package io.github.thefrsh.stratus.transfer.request;
 
 import io.github.thefrsh.stratus.troubleshooting.validation.annotation.NoBlanks;
 import io.github.thefrsh.stratus.troubleshooting.validation.annotation.Password;
@@ -12,10 +12,10 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.validation.groups.Default;
 
-@Getter
 @Builder
+@Getter
 @AllArgsConstructor
-public class RegisterCredentialsTransfer
+public class RegisterCredentialsRequest
 {
     @NotNull(message = "Username property is missing", groups = First.class)
     @NoBlanks(message = "Username must not contain any white character")

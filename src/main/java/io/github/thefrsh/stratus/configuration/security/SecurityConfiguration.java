@@ -1,7 +1,9 @@
 package io.github.thefrsh.stratus.configuration.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.thefrsh.stratus.configuration.security.filter.JwtUsernamePasswordAuthenticationFilter;
 import io.github.thefrsh.stratus.configuration.security.filter.JwtVerifyFilter;
+import io.github.thefrsh.stratus.troubleshooting.resolving.ServletExceptionResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +16,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -21,6 +25,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
 {
     private final UserDetailsJpaService userDetailsJpaService;
     private final PasswordEncoder passwordEncoder;
+    private final ObjectMapper objectMapper;
+    private final ServletExceptionResolver resolver;
 
     @Value("${spring.security.jwt.secret}")
     private String jwtSecret;
@@ -29,10 +35,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
     private int tokenExpirationTimeInDays;
 
     @Autowired
-    public SecurityConfiguration(UserDetailsJpaService userDetailsJpaService, PasswordEncoder passwordEncoder)
+    public SecurityConfiguration(UserDetailsJpaService userDetailsJpaService, PasswordEncoder passwordEncoder,
+                                 ObjectMapper objectMapper, ServletExceptionResolver resolver)
     {
         this.userDetailsJpaService = userDetailsJpaService;
         this.passwordEncoder = passwordEncoder;
+        this.objectMapper = objectMapper;
+        this.resolver = resolver;
     }
 
     @Override
@@ -41,10 +50,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
         http.csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilter(new JwtUsernamePasswordAuthenticationFilter(authenticationManager(), jwtSecret,
-                        tokenExpirationTimeInDays))
-                .addFilterAfter(new JwtVerifyFilter(jwtSecret, userDetailsJpaService),
-                        JwtUsernamePasswordAuthenticationFilter.class)
+                .addFilter(jwtUsernamePasswordAuthenticationFilter())
+                .addFilterAfter(jwtVerifyFilter(), JwtUsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .anyRequest()
                 .authenticated();
@@ -69,5 +76,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
         daoAuthenticationProvider.setUserDetailsService(userDetailsJpaService);
         return daoAuthenticationProvider;
+    }
+
+    public UsernamePasswordAuthenticationFilter jwtUsernamePasswordAuthenticationFilter() throws Exception
+    {
+        var filter = new JwtUsernamePasswordAuthenticationFilter(objectMapper, resolver, jwtSecret,
+                tokenExpirationTimeInDays);
+        filter.setAuthenticationManager(authenticationManager());
+
+        return filter;
+    }
+
+    public OncePerRequestFilter jwtVerifyFilter()
+    {
+        return new JwtVerifyFilter(userDetailsJpaService, resolver, jwtSecret);
     }
 }
