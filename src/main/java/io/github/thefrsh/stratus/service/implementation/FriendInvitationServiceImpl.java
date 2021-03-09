@@ -78,7 +78,7 @@ public class FriendInvitationServiceImpl implements FriendInvitationService
                 .findFirst()
                 .orElseThrow(() -> new UserFriendException("You have not invitation with id " + invitationId));
 
-        friendInvitationJpaRepository.delete(invitation);
+        friendInvitationJpaRepository.deleteById(invitationId);
         webSocketService.sendInformation(invitation.getSender().getId(), "User " + user.getUsername() + " declined " +
                 "your invitation");
     }

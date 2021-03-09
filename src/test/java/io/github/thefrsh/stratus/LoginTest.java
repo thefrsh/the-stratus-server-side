@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureDataJpa
 @RunWith(value = SpringRunner.class)
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-@SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class LoginTest
 {
     private static final String TEST_USERNAME = "test";
@@ -47,19 +47,6 @@ public class LoginTest
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    public void seedTestUser()
-    {
-        var user = User.builder()
-                .username(TEST_USERNAME)
-                .password(passwordEncoder.encode(TEST_PASSWORD))
-                .email(TEST_EMAIL)
-                .build();
-
-        System.out.println(passwordEncoder.encode(TEST_PASSWORD));
-
-        userJpaRepository.save(user);
-    }
 
     @Test
     public void loginAttempt_existingUser_shouldReturnOkWithToken() throws Exception
@@ -106,5 +93,19 @@ public class LoginTest
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{'incorrect' : 'body'}"))
                 .andExpect(status().isBadRequest());
+    }
+
+    private void seedTestUser()
+    {
+        var user = User.builder()
+                .id(1L)
+                .username(TEST_USERNAME)
+                .password(passwordEncoder.encode(TEST_PASSWORD))
+                .email(TEST_EMAIL)
+                .build();
+
+        System.out.println(passwordEncoder.encode(TEST_PASSWORD));
+
+        userJpaRepository.save(user);
     }
 }

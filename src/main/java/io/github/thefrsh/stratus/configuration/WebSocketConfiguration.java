@@ -1,6 +1,7 @@
 package io.github.thefrsh.stratus.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.converter.DefaultContentTypeResolver;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -19,6 +20,14 @@ import java.util.List;
 @EnableWebSocketMessageBroker
 public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer
 {
+    private final ObjectMapper objectMapper;
+
+    @Autowired
+    public WebSocketConfiguration(ObjectMapper objectMapper)
+    {
+        this.objectMapper = objectMapper;
+    }
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry)
     {
@@ -43,7 +52,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer
         resolver.setDefaultMimeType(MimeTypeUtils.APPLICATION_JSON);
 
         var converter = new MappingJackson2MessageConverter();
-        converter.setObjectMapper(new ObjectMapper());
+        converter.setObjectMapper(objectMapper);
         converter.setContentTypeResolver(resolver);
 
         messageConverters.add(converter);
