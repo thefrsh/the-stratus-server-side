@@ -4,7 +4,6 @@ import lombok.*;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.List;
 
 @Entity
@@ -30,27 +29,27 @@ public class User
     @EqualsAndHashCode.Include
     private String email;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "table_friends",
                joinColumns = @JoinColumn(name = "user_id"),
                inverseJoinColumns = @JoinColumn(name = "friend_id"))
     private List<User> friends;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "table_friends",
                joinColumns = @JoinColumn(name = "friend_id"),
                inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> friendsOf;
 
-    @ManyToMany(mappedBy = "participants")
+    @ManyToMany(mappedBy = "participants", cascade = CascadeType.ALL)
     private List<Conversation> conversations;
 
     @OneToMany(mappedBy = "sender", fetch = FetchType.LAZY)
     private List<ChatMessage> messages;
 
-    @OneToMany(mappedBy = "receiver")
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL)
     private List<FriendInvitation> receivedInvitations;
 
-    @OneToMany(mappedBy = "sender")
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
     private List<FriendInvitation> sentInvitations;
 }

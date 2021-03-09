@@ -66,7 +66,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
     @Override
     public void configure(WebSecurity web)
     {
-        web.ignoring().antMatchers("/register", "/h2-console/**", "/websocket");
+        web.ignoring().antMatchers("/register", "/h2-console/**", "/websocket/**");
     }
 
     @Bean
