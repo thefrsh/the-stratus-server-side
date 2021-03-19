@@ -11,8 +11,7 @@ import javax.validation.constraints.NotNull;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConversationIdRequest
-{
+public class ConversationIdRequest {
     @NotNull(message = "Conversation id property is missing")
     private Long id;
 }

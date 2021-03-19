@@ -12,9 +12,10 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = NoBlanksValidator.class)
-public @interface NoBlanks
-{
+public @interface NoBlanks {
     String message() default "There are white characters";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

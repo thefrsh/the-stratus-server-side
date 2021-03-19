@@ -11,16 +11,15 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
 import java.util.Date;
 import java.util.Objects;
 
 @RestControllerAdvice
-public class RestControllerExceptionHandler
-{
+public class RestControllerExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Errors> handleMethodArgumentNotValidException(HttpServletRequest request,
-                                                                        MethodArgumentNotValidException e)
-    {
+                                                                        MethodArgumentNotValidException e) {
         var message = Objects.requireNonNull(e.getBindingResult()
                 .getFieldError())
                 .getDefaultMessage();
@@ -38,9 +37,9 @@ public class RestControllerExceptionHandler
         return new ResponseEntity<>(errors, headers, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({NumberFormatException.class, HttpMessageNotReadableException.class})
-    public ResponseEntity<Errors> handleNumberFormatException(HttpServletRequest request, Exception e)
-    {
+    @ExceptionHandler({NumberFormatException.class, HttpMessageNotReadableException.class,
+            ConstraintViolationException.class})
+    public ResponseEntity<Errors> handleNumberFormatException(HttpServletRequest request, Exception e) {
         var errors = Errors.builder()
                 .timestamp(new Date())
                 .status(HttpStatus.BAD_REQUEST)

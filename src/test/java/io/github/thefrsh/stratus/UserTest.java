@@ -130,11 +130,11 @@ class UserTest
         stomp.disconnect();
 
         invitationJpaRepository.findById(invitation.getId())
-                .ifPresentOrElse(inv -> {
+                .peek(inv -> {
                     assertEquals(testUser.getId(), inv.getReceiver().getId());
                     assertEquals(testFriend.getId(), inv.getSender().getId());
-                },
-                Assertions::fail);
+                })
+                .onEmpty(Assertions::fail);
 
         assertEquals(TransferType.FRIEND_INVITATION, invitation.getType());
         assertEquals(testFriend.getId(), invitation.getSender().getId());
@@ -234,11 +234,12 @@ class UserTest
 
         var savedConversation = conversationJpaRepository.save(conversation);
 
-        userJpaRepository.findById(testUser.getId()).ifPresentOrElse(user -> {
+        userJpaRepository.findById(testUser.getId()).peek(user -> {
             user.getFriends().add(testFriend);
             userJpaRepository.save(user);
-        },
-        Assertions::fail);
+        })
+        .onEmpty(Assertions::fail);
+
         userJpaRepository.flush();
 
         var conversationIdRequest = new ConversationIdRequest(savedConversation.getId());

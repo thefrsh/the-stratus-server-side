@@ -21,8 +21,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter
-{
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final UserDetailsJpaService userDetailsJpaService;
     private final PasswordEncoder passwordEncoder;
     private final ObjectMapper objectMapper;
@@ -36,8 +35,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
 
     @Autowired
     public SecurityConfiguration(UserDetailsJpaService userDetailsJpaService, PasswordEncoder passwordEncoder,
-                                 ObjectMapper objectMapper, ServletExceptionResolver resolver)
-    {
+                                 ObjectMapper objectMapper, ServletExceptionResolver resolver) {
         this.userDetailsJpaService = userDetailsJpaService;
         this.passwordEncoder = passwordEncoder;
         this.objectMapper = objectMapper;
@@ -45,8 +43,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
     }
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception
-    {
+    protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
@@ -58,28 +55,24 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
     }
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth)
-    {
+    protected void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(daoAuthenticationProvider());
     }
 
     @Override
-    public void configure(WebSecurity web)
-    {
+    public void configure(WebSecurity web) {
         web.ignoring().antMatchers("/register", "/h2-console/**", "/websocket/**");
     }
 
     @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider()
-    {
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
         var daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
         daoAuthenticationProvider.setUserDetailsService(userDetailsJpaService);
         return daoAuthenticationProvider;
     }
 
-    public UsernamePasswordAuthenticationFilter jwtUsernamePasswordAuthenticationFilter() throws Exception
-    {
+    public UsernamePasswordAuthenticationFilter jwtUsernamePasswordAuthenticationFilter() throws Exception {
         var filter = new JwtUsernamePasswordAuthenticationFilter(objectMapper, resolver, jwtSecret,
                 tokenExpirationTimeInDays);
         filter.setAuthenticationManager(authenticationManager());
@@ -87,8 +80,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
         return filter;
     }
 
-    public OncePerRequestFilter jwtVerifyFilter()
-    {
+    public OncePerRequestFilter jwtVerifyFilter() {
         return new JwtVerifyFilter(userDetailsJpaService, resolver, jwtSecret);
     }
 }

@@ -1,13 +1,22 @@
 package io.github.thefrsh.stratus.repository;
 
 import io.github.thefrsh.stratus.model.User;
-import org.springframework.data.jpa.repository.JpaRepository;
+import io.vavr.control.Option;
 
-import java.util.Optional;
+import org.springframework.data.repository.Repository;
 
-public interface UserJpaRepository extends JpaRepository<User, Long>
-{
-    Optional<User> findByUsername(String username);
+public interface UserJpaRepository extends Repository<User, Long> {
+    User save(User user);
 
-    Optional<User> findByUsernameOrEmail(String username, String email);
+    Option<User> findById(Long id);
+
+    Option<User> findByUsername(String username);
+
+    Option<User> findByUsernameOrEmail(String username, String email);
+
+    void deleteAll();
+
+    boolean existsById(Long id);
+
+    void flush();
 }

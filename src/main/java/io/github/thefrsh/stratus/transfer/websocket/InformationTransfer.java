@@ -4,15 +4,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
 
 @Getter
-public class InformationTransfer
-{
+public class InformationTransfer {
     private final TransferType type;
 
     private final String content;
 
     @JsonCreator
-    public InformationTransfer(String content)
-    {
+    public InformationTransfer(String content) {
         this.type = TransferType.INFORMATION;
         this.content = content;
     }

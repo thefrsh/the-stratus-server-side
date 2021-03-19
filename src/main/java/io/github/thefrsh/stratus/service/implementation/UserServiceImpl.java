@@ -7,6 +7,7 @@ import io.github.thefrsh.stratus.service.*;
 import io.github.thefrsh.stratus.transfer.response.ConversationResponse;
 import io.github.thefrsh.stratus.troubleshooting.exception.UserFriendException;
 import io.github.thefrsh.stratus.troubleshooting.exception.UserNotFoundException;
+import io.vavr.collection.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,8 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Arrays;
 
 @Service
-public class UserServiceImpl implements UserService
-{
+public class UserServiceImpl implements UserService {
     private final WebSocketService webSocketService;
     private final ConversationService conversationService;
     private final UserJpaRepository userJpaRepository;
@@ -25,8 +25,7 @@ public class UserServiceImpl implements UserService
     @Autowired
     public UserServiceImpl(WebSocketService webSocketService, ConversationService conversationService,
                            UserJpaRepository userJpaRepository, TransferConversionService conversionService,
-                           FriendInvitationService invitationService)
-    {
+                           FriendInvitationService invitationService) {
         this.webSocketService = webSocketService;
         this.conversationService = conversationService;
         this.userJpaRepository = userJpaRepository;
@@ -36,43 +35,41 @@ public class UserServiceImpl implements UserService
 
     @Override
     @Transactional
-    public ConversationResponse addFriend(Long userId, Long friendId)
-    {
+    public ConversationResponse addFriend(Long userId, Long friendId) {
         var user = findUser(userId);
         var friend = findUser(friendId);
 
-        if (areFriends(user, friendId))
-        {
+        if (areFriends(user, friendId)) {
             throw new UserFriendException("User " + friendId + " is actually friend of user with id " + userId);
         }
 
-        var invitationId = user.getReceivedInvitations().stream()
-                .filter(invitation -> invitation.getSender().getId().equals(friendId))
+        return List.ofAll(user.getReceivedInvitations())
+                .find(invitation -> invitation.getSender().getId().equals(friendId))
                 .map(FriendInvitation::getId)
-                .findFirst()
-                .orElseThrow(() -> new UserFriendException("User " + friendId + " has not invited you to friend list"));
+                .onEmpty(() -> {
+                    throw new UserFriendException("User " + friendId + " has not invited you to friend list");
+                })
+                .map(invitationId -> {
+                    user.getFriends().add(friend);
 
-        user.getFriends().add(friend);
+                    var conversation = conversationService.createConversation(Arrays.asList(user, friend));
 
-        var conversation = conversationService.createConversation(Arrays.asList(user, friend));
+                    friendInvitationService.removeInvitation(invitationId);
 
-        friendInvitationService.removeInvitation(invitationId);
+                    webSocketService.sendInformation(friendId, user.getUsername() + " accepted your friend invitation");
+                    webSocketService.sendConversation(friendId, conversation);
 
-        webSocketService.sendInformation(friendId, user.getUsername() + " accepted your friend invitation");
-        webSocketService.sendConversation(friendId, conversation);
-
-        return conversionService.toConversationResponse(conversation);
+                    return conversionService.toConversationResponse(conversation);
+                })
+                .get();
     }
 
     @Override
     @Transactional
-    // possible not removing friend on friend side
-    public void removeFriend(Long userId, Long friendId, Long conversationId)
-    {
+    public void removeFriend(Long userId, Long friendId, Long conversationId) {
         var user = findUser(userId);
 
-        if (!areFriends(user, friendId))
-        {
+        if (!areFriends(user, friendId)) {
             throw new UserFriendException("User with id " + friendId + " is not a friend of user " + userId);
         }
 
@@ -89,17 +86,25 @@ public class UserServiceImpl implements UserService
 
     @Override
     @Transactional
-    public User findUser(Long userId)
-    {
+    public User findUser(Long userId) {
         return userJpaRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " does not exist"));
+                .getOrElseThrow(() -> new UserNotFoundException("User with id " + userId + " does not exist"));
     }
 
-    private boolean areFriends(User user, Long friendId)
-    {
-        return user.getFriends()
-                .stream()
+    @Override
+    @Transactional
+    public java.util.List<ConversationResponse> getConversations(Long userId) {
+        var user = findUser(userId);
+
+        return List.ofAll(user.getConversations())
+                .map(conversionService::toConversationResponse)
+                .toJavaList();
+    }
+
+    private boolean areFriends(User user, Long friendId) {
+        return List.ofAll(user.getFriends())
                 .map(User::getId)
-                .anyMatch(id -> id.equals(friendId));
+                .find(id -> id.equals(friendId))
+                .isDefined();
     }
 }

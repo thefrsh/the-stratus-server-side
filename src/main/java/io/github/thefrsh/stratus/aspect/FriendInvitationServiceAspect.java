@@ -9,14 +9,11 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
-public class FriendInvitationServiceAspect
-{
+public class FriendInvitationServiceAspect {
     @Before(value = "execution(* io.github.thefrsh.stratus.service.implementation.FriendInvitationServiceImpl" +
             ".inviteToFriends(Long, Long)) && args(userId, friendId)", argNames = "userId, friendId")
-    public void checkIfIdsAreDifferent(Long userId, Long friendId)
-    {
-        if (userId.equals(friendId))
-        {
+    public void checkIfIdsAreDifferent(Long userId, Long friendId) {
+        if (userId.equals(friendId)) {
             throw new IdConflictException("User ids are the same");
         }
 
@@ -24,8 +21,7 @@ public class FriendInvitationServiceAspect
                 .getAuthentication()
                 .getCredentials();
 
-        if (!id.equals(userId))
-        {
+        if (!id.equals(userId)) {
             throw new NotThatUserException("Your id is " + id + " but " + userId + " was sent in request body");
         }
     }

@@ -8,16 +8,16 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
-public class UserControllerAspect {
-    @Before("execution(* io.github.thefrsh.stratus.controller.UserController.*(Long,..)) && args(userId,..) &&" +
-            "!execution(* io.github.thefrsh.stratus.controller.UserController.inviteToFriends(..))")
-    public void validateUserId(Long userId) {
+public class ConversationServiceAspect {
+    @Before(value = "execution(* io.github.thefrsh.stratus.service.implementation.ConversationServiceImpl.*" +
+            "(*, Long, *)) && args(*, senderId, *)", argNames = "senderId")
+    public void validateUserId(Long senderId) {
         var id = (Long) SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getCredentials();
 
-        if (!id.equals(userId)) {
-            throw new NotThatUserException("Your id is " + id + " but requested for resource assigned to " + userId);
+        if (!id.equals(senderId)) {
+            throw new NotThatUserException("Your id is " + id + " but " + senderId + " was sent in request body");
         }
     }
 }

@@ -15,8 +15,7 @@ import javax.validation.groups.Default;
 @Builder
 @Getter
 @AllArgsConstructor
-public class RegisterCredentialsRequest
-{
+public class RegisterCredentialsRequest {
     @NotNull(message = "Username property is missing", groups = First.class)
     @NoBlanks(message = "Username must not contain any white character")
     @Size(min = 3, max = 20, message = "Username must be between {min} and {max} characters long")
@@ -32,8 +31,10 @@ public class RegisterCredentialsRequest
     @Email(message = "${validatedValue} is not a valid email address")
     private final String email;
 
-    public interface First {}
+    public interface First {
+    }
 
     @GroupSequence({First.class, Default.class})
-    public interface ValidationOrder {}
+    public interface ValidationOrder {
+    }
 }

@@ -5,14 +5,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ConversationRemoveTransfer
-{
+public class ConversationRemoveTransfer {
     private final TransferType type;
 
     private Long id;
 
-    public ConversationRemoveTransfer()
-    {
+    public ConversationRemoveTransfer() {
         type = TransferType.REMOVE_CONVERSATION;
     }
 }

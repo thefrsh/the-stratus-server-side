@@ -14,19 +14,16 @@ import java.io.IOException;
 import java.util.Date;
 
 @Component
-public class ServletExceptionResolver
-{
+public class ServletExceptionResolver {
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public ServletExceptionResolver(ObjectMapper objectMapper)
-    {
+    public ServletExceptionResolver(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
     public void resolveException(HttpServletRequest request, HttpServletResponse response,
-                                 ResponseStatusException e) throws IOException
-    {
+                                 ResponseStatusException e) throws IOException {
         var errors = Errors.builder()
                 .timestamp(new Date())
                 .status(e.getStatus())

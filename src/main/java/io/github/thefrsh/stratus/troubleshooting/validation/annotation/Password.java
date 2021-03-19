@@ -12,9 +12,10 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = PasswordValidator.class)
-public @interface Password
-{
+public @interface Password {
     String message() default "Password is too weak";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

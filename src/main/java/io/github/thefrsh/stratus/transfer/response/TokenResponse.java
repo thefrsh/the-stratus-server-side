@@ -9,8 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
-public class TokenResponse
-{
+public class TokenResponse {
     private Long id;
     private String token;
 }

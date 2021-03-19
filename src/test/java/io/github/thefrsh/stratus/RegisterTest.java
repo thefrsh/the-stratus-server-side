@@ -55,11 +55,11 @@ public class RegisterTest
                 .getResponse()
                 .getContentAsString();
 
-        var userTransfer = objectMapper.readValue(json, UserResponse.class);
+        var userResponse = objectMapper.readValue(json, UserResponse.class);
 
-        assertNotNull(userTransfer.getId());
-        assertEquals("newuser", userTransfer.getUsername());
-        assertTrue(userJpaRepository.existsById(userTransfer.getId()));
+        assertNotNull(userResponse.getId());
+        assertEquals("newuser", userResponse.getUsername());
+        assertTrue(userJpaRepository.existsById(userResponse.getId()));
     }
 
     @Test

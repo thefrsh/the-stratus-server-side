@@ -9,8 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ConversationResponse
-{
+public class ConversationResponse {
     private Long id;
     private List<String> participants;
 }

@@ -10,22 +10,19 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 
 @Service
-public class UserDetailsJpaService implements UserDetailsService
-{
+public class UserDetailsJpaService implements UserDetailsService {
     private final UserJpaRepository repository;
 
     @Autowired
-    public UserDetailsJpaService(UserJpaRepository repository)
-    {
+    public UserDetailsJpaService(UserJpaRepository repository) {
         this.repository = repository;
     }
 
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String username)
-    {
+    public UserDetails loadUserByUsername(String username) {
         return repository.findByUsername(username)
                 .map(UserDetailsJpaAdapter::new)
-                .orElseThrow(() -> new UsernameNotFoundException("User " + username + " has not been found"));
+                .getOrElseThrow(() -> new UsernameNotFoundException("User " + username + " has not been found"));
     }
 }

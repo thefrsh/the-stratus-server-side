@@ -7,8 +7,7 @@ import org.springframework.http.HttpStatus;
 import java.util.Date;
 
 @Getter
-public class Errors
-{
+public class Errors {
     private final Date timestamp;
     private final int status;
     private final String error;
@@ -16,8 +15,7 @@ public class Errors
     private final String path;
 
     @Builder
-    private Errors(Date timestamp, HttpStatus status, String message, String path)
-    {
+    private Errors(Date timestamp, HttpStatus status, String message, String path) {
         this.timestamp = timestamp;
         this.status = status.value();
         this.error = status.getReasonPhrase();
