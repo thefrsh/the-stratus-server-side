@@ -7,9 +7,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.Repository;
 
 public interface ChatMessageRepository extends Repository<ChatMessage, Long> {
+
     ChatMessage save(ChatMessage chatMessage);
 
     Option<ChatMessage> findById(Long id);
 
     List<ChatMessage> findAllByConversationId(Long id, Pageable pageable);
+
+    void deleteAll();
 }
