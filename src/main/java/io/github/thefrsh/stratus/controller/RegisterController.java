@@ -10,14 +10,12 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/register")
-public class RegisterController
-{
+@RequestMapping(path = "/register")
+public class RegisterController {
     private final RegisterService registerService;
 
     @Autowired
-    public RegisterController(RegisterService registerService)
-    {
+    public RegisterController(RegisterService registerService) {
         this.registerService = registerService;
     }
 
@@ -25,8 +23,7 @@ public class RegisterController
     @PostMapping(path = {"", "/"}, consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public UserResponse register(@Validated({RegisterCredentialsRequest.ValidationOrder.class})
-                                 @RequestBody RegisterCredentialsRequest credentials)
-    {
+                                 @RequestBody RegisterCredentialsRequest credentials) {
         return registerService.register(credentials);
     }
 }

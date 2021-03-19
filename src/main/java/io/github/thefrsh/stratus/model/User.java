@@ -14,8 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class User
-{
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,14 +30,14 @@ public class User
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "table_friends",
-               joinColumns = @JoinColumn(name = "user_id"),
-               inverseJoinColumns = @JoinColumn(name = "friend_id"))
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_id"))
     private List<User> friends;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "table_friends",
-               joinColumns = @JoinColumn(name = "friend_id"),
-               inverseJoinColumns = @JoinColumn(name = "user_id"))
+            joinColumns = @JoinColumn(name = "friend_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> friendsOf;
 
     @ManyToMany(mappedBy = "participants", cascade = CascadeType.ALL)

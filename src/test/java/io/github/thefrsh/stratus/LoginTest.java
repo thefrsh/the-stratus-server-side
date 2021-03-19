@@ -30,8 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(value = SpringRunner.class)
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class LoginTest
-{
+public class LoginTest {
     private static final String TEST_USERNAME = "test";
     private static final String TEST_PASSWORD = "test";
     private static final String TEST_EMAIL = "test@test.com";
@@ -49,8 +48,7 @@ public class LoginTest
     private PasswordEncoder passwordEncoder;
 
     @Test
-    public void loginAttempt_existingUser_shouldReturnOkWithToken() throws Exception
-    {
+    public void loginAttempt_existingUser_shouldReturnOkWithToken() throws Exception {
         seedTestUser();
 
         var loginCredentials = LoginCredentialsRequest.builder()
@@ -73,8 +71,7 @@ public class LoginTest
     }
 
     @Test
-    public void loginAttempt_nonExistingUser_shouldReturnUnauthorized() throws Exception
-    {
+    public void loginAttempt_nonExistingUser_shouldReturnUnauthorized() throws Exception {
         var loginCredentials = LoginCredentialsRequest.builder()
                 .username("non-existing")
                 .password("test")
@@ -87,16 +84,14 @@ public class LoginTest
     }
 
     @Test
-    public void loginAttempt_incorrectBody_shouldReturnBadRequest() throws Exception
-    {
+    public void loginAttempt_incorrectBody_shouldReturnBadRequest() throws Exception {
         mockMvc.perform(post("/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{'incorrect' : 'body'}"))
                 .andExpect(status().isBadRequest());
     }
 
-    private void seedTestUser()
-    {
+    private void seedTestUser() {
         var user = User.builder()
                 .id(1L)
                 .username(TEST_USERNAME)

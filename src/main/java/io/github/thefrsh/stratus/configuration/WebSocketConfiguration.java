@@ -18,26 +18,22 @@ import java.util.List;
 
 @Configuration
 @EnableWebSocketMessageBroker
-public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer
-{
+public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer {
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public WebSocketConfiguration(ObjectMapper objectMapper)
-    {
+    public WebSocketConfiguration(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public void configureMessageBroker(MessageBrokerRegistry registry)
-    {
+    public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/topic");
         registry.setApplicationDestinationPrefixes("/message");
     }
 
     @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry)
-    {
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/websocket")
                 .withSockJS();
 
@@ -46,8 +42,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer
     }
 
     @Override
-    public boolean configureMessageConverters(List<MessageConverter> messageConverters)
-    {
+    public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
         var resolver = new DefaultContentTypeResolver();
         resolver.setDefaultMimeType(MimeTypeUtils.APPLICATION_JSON);
 

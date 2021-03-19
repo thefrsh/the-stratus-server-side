@@ -20,8 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class JwtVerifyFilter extends OncePerRequestFilter
-{
+public class JwtVerifyFilter extends OncePerRequestFilter {
     private static final String BEARER_PREFIX = "Bearer ";
     private static final String EMPTY_STRING = "";
 
@@ -29,8 +28,7 @@ public class JwtVerifyFilter extends OncePerRequestFilter
     private final ServletExceptionResolver resolver;
     private final String jwtSecret;
 
-    public JwtVerifyFilter(UserDetailsService service, ServletExceptionResolver resolver, String jwtSecret)
-    {
+    public JwtVerifyFilter(UserDetailsService service, ServletExceptionResolver resolver, String jwtSecret) {
         this.service = service;
         this.resolver = resolver;
         this.jwtSecret = jwtSecret;
@@ -38,14 +36,11 @@ public class JwtVerifyFilter extends OncePerRequestFilter
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain) throws ServletException, IOException
-    {
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
         var authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        try
-        {
-            if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX))
-            {
+        try {
+            if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
                 throw new JwtException("Token is missing or it is in bad format");
             }
 
@@ -67,8 +62,7 @@ public class JwtVerifyFilter extends OncePerRequestFilter
 
             filterChain.doFilter(request, response);
         }
-        catch (JwtException | UsernameNotFoundException e)
-        {
+        catch (JwtException | UsernameNotFoundException e) {
             resolver.resolveException(request, response, new ResponseStatusException(HttpStatus.UNAUTHORIZED,
                     e.getMessage()));
         }

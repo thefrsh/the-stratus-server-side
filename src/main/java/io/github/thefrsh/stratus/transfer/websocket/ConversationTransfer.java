@@ -7,15 +7,13 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ConversationTransfer
-{
+public class ConversationTransfer {
     private final TransferType type;
 
     private Long id;
     private List<String> participants;
 
-    public ConversationTransfer()
-    {
+    public ConversationTransfer() {
         type = TransferType.NEW_CONVERSATION;
     }
 }

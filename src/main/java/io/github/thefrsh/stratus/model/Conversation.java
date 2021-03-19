@@ -12,16 +12,15 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Conversation
-{
+public class Conversation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToMany
     @JoinTable(name = "table_users_conversations",
-               joinColumns = @JoinColumn(name = "conversation_id"),
-               inverseJoinColumns = @JoinColumn(name = "user_id"))
+            joinColumns = @JoinColumn(name = "conversation_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> participants;
 
     @OneToMany(mappedBy = "conversation")
