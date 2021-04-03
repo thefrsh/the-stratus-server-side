@@ -16,6 +16,7 @@ import java.util.Arrays;
 
 @Service
 public class UserServiceImpl implements UserService {
+
     private final WebSocketService webSocketService;
     private final ConversationService conversationService;
     private final UserJpaRepository userJpaRepository;
@@ -26,6 +27,7 @@ public class UserServiceImpl implements UserService {
     public UserServiceImpl(WebSocketService webSocketService, ConversationService conversationService,
                            UserJpaRepository userJpaRepository, TransferConversionService conversionService,
                            FriendInvitationService invitationService) {
+
         this.webSocketService = webSocketService;
         this.conversationService = conversationService;
         this.userJpaRepository = userJpaRepository;
@@ -36,6 +38,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public ConversationResponse addFriend(Long userId, Long friendId) {
+
         var user = findUser(userId);
         var friend = findUser(friendId);
 
@@ -67,6 +70,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void removeFriend(Long userId, Long friendId, Long conversationId) {
+
         var user = findUser(userId);
 
         if (!areFriends(user, friendId)) {
@@ -87,6 +91,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User findUser(Long userId) {
+
         return userJpaRepository.findById(userId)
                 .getOrElseThrow(() -> new UserNotFoundException("User with id " + userId + " does not exist"));
     }
@@ -94,6 +99,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public java.util.List<ConversationResponse> getConversations(Long userId) {
+
         var user = findUser(userId);
 
         return List.ofAll(user.getConversations())
@@ -102,6 +108,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private boolean areFriends(User user, Long friendId) {
+
         return List.ofAll(user.getFriends())
                 .map(User::getId)
                 .find(id -> id.equals(friendId))

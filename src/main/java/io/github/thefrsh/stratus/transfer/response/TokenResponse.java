@@ -10,6 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 public class TokenResponse {
+
     private Long id;
     private String token;
 }

@@ -5,7 +5,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.CONFLICT)
 public class UserFriendException extends RuntimeException {
+
     public UserFriendException(String message) {
+
         super(message);
     }
 }

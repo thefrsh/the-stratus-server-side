@@ -9,9 +9,11 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 public class UserControllerAspect {
+
     @Before("execution(* io.github.thefrsh.stratus.controller.UserController.*(Long,..)) && args(userId,..) &&" +
             "!execution(* io.github.thefrsh.stratus.controller.UserController.inviteToFriends(..))")
     public void validateUserId(Long userId) {
+
         var id = (Long) SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getCredentials();

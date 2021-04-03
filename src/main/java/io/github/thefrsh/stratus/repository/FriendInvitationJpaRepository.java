@@ -8,6 +8,7 @@ import org.springframework.data.repository.Repository;
 import org.springframework.lang.NonNull;
 
 public interface FriendInvitationJpaRepository extends Repository<FriendInvitation, Long> {
+
     FriendInvitation save(FriendInvitation friendInvitation);
 
     Option<FriendInvitation> findById(Long id);

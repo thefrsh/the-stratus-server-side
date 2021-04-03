@@ -5,6 +5,7 @@ import io.vavr.control.Option;
 import org.springframework.data.repository.Repository;
 
 public interface ConversationJpaRepository extends Repository<Conversation, Long> {
+
     Option<Conversation> findById(Long id);
 
     Conversation save(Conversation conversation);

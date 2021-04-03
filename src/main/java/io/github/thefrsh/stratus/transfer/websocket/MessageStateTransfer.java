@@ -8,6 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MessageStateTransfer {
+
     private final TransferType type;
 
     private final Long id;
@@ -15,6 +16,7 @@ public class MessageStateTransfer {
 
     @Builder
     public MessageStateTransfer(Long id, MessageState messageState) {
+
         type = TransferType.CHAT_MESSAGE_STATE;
 
         this.id = id;

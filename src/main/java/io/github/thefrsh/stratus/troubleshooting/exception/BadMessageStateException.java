@@ -5,7 +5,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.CONFLICT)
 public class BadMessageStateException extends RuntimeException {
+
     public BadMessageStateException(String message) {
+
         super(message);
     }
 }

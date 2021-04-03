@@ -6,6 +6,7 @@ import io.vavr.control.Option;
 import org.springframework.data.repository.Repository;
 
 public interface UserJpaRepository extends Repository<User, Long> {
+
     User save(User user);
 
     Option<User> findById(Long id);

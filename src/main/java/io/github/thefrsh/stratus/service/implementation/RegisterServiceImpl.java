@@ -14,6 +14,7 @@ import javax.transaction.Transactional;
 
 @Service
 public class RegisterServiceImpl implements RegisterService {
+
     private final UserJpaRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final TransferConversionService conversionService;
@@ -21,6 +22,7 @@ public class RegisterServiceImpl implements RegisterService {
     @Autowired
     public RegisterServiceImpl(UserJpaRepository repository, PasswordEncoder passwordEncoder,
                                TransferConversionService conversionService) {
+
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
         this.conversionService = conversionService;
@@ -29,6 +31,7 @@ public class RegisterServiceImpl implements RegisterService {
     @Override
     @Transactional
     public UserResponse register(RegisterCredentialsRequest credentials) {
+
         repository.findByUsernameOrEmail(credentials.getUsername(), credentials.getEmail()).peek(u -> {
 
             var message = "";

@@ -5,7 +5,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.CONFLICT)
 public class UserMessageException extends RuntimeException {
+
     public UserMessageException(String message) {
+
         super(message);
     }
 }

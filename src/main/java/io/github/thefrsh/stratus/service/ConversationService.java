@@ -7,6 +7,7 @@ import io.github.thefrsh.stratus.transfer.response.MessageResponse;
 import java.util.List;
 
 public interface ConversationService {
+
     Conversation createConversation(List<User> participants);
 
     Conversation removeConversationBetween(List<User> participants, Long conversationId);

@@ -10,6 +10,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class ConversationResponse {
+
     private Long id;
     private List<String> participants;
 }

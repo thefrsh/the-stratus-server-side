@@ -11,16 +11,19 @@ import javax.transaction.Transactional;
 
 @Service
 public class UserDetailsJpaService implements UserDetailsService {
+
     private final UserJpaRepository repository;
 
     @Autowired
     public UserDetailsJpaService(UserJpaRepository repository) {
+
         this.repository = repository;
     }
 
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) {
+
         return repository.findByUsername(username)
                 .map(UserDetailsJpaAdapter::new)
                 .getOrElseThrow(() -> new UsernameNotFoundException("User " + username + " has not been found"));

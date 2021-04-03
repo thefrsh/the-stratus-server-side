@@ -6,6 +6,7 @@ import io.github.thefrsh.stratus.transfer.response.ConversationResponse;
 import java.util.List;
 
 public interface UserService {
+
     ConversationResponse addFriend(Long userId, Long friendId);
 
     void removeFriend(Long userId, Long friendId, Long conversationId);

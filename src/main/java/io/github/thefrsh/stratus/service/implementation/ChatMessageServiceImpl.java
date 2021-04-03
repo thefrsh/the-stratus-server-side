@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ChatMessageServiceImpl implements ChatMessageService {
+
     private final ChatMessageRepository chatMessageRepository;
     private final TransferConversionService conversionService;
     private final WebSocketService webSocketService;
@@ -26,6 +27,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     @Autowired
     public ChatMessageServiceImpl(ChatMessageRepository chatMessageRepository,
                                   TransferConversionService conversionService, WebSocketService webSocketService) {
+
         this.chatMessageRepository = chatMessageRepository;
         this.conversionService = conversionService;
         this.webSocketService = webSocketService;
@@ -34,12 +36,14 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     @Override
     @Transactional
     public ChatMessage save(ChatMessage chatMessage) {
+
         return chatMessageRepository.save(chatMessage);
     }
 
     @Override
     @Transactional
     public void updateStatus(Long conversationId, Long messageId) {
+
         var message = findChatMessage(messageId);
 
         List.of(message)
@@ -67,12 +71,14 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     @Override
     @Transactional
     public java.util.List<MessageResponse> getConversationMessages(Long conversationId, Pageable pageable) {
+
         return chatMessageRepository.findAllByConversationId(conversationId, pageable)
                 .map(conversionService::toMessageResponse)
                 .toJavaList();
     }
 
     private ChatMessage findChatMessage(Long id) {
+
         return chatMessageRepository.findById(id)
                 .getOrElseThrow(() -> new ChatMessageNotFoundException("Message with id " + id + " has not been " +
                         "found"));

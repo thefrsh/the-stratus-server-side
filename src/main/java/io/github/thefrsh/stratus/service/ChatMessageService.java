@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface ChatMessageService {
+
     ChatMessage save(ChatMessage chatMessage);
 
     void updateStatus(Long conversationId, Long messageId);

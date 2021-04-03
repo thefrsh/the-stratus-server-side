@@ -6,6 +6,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 public class NoBlanksValidator implements ConstraintValidator<NoBlanks, String> {
+
     @Override
     public void initialize(NoBlanks constraintAnnotation) {
         // no initialization in required
@@ -13,6 +14,7 @@ public class NoBlanksValidator implements ConstraintValidator<NoBlanks, String> 
 
     @Override
     public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
+
         return s.matches("\\S+");
     }
 }
