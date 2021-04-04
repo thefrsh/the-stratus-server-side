@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class JwtVerifyFilter extends OncePerRequestFilter {
+
     private static final String BEARER_PREFIX = "Bearer ";
     private static final String EMPTY_STRING = "";
 
@@ -29,6 +30,7 @@ public class JwtVerifyFilter extends OncePerRequestFilter {
     private final String jwtSecret;
 
     public JwtVerifyFilter(UserDetailsService service, ServletExceptionResolver resolver, String jwtSecret) {
+
         this.service = service;
         this.resolver = resolver;
         this.jwtSecret = jwtSecret;
@@ -37,6 +39,7 @@ public class JwtVerifyFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
+
         var authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         try {

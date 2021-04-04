@@ -9,9 +9,11 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 public class ConversationServiceAspect {
+
     @Before(value = "execution(* io.github.thefrsh.stratus.service.implementation.ConversationServiceImpl.*" +
             "(*, Long, *)) && args(*, senderId, *)", argNames = "senderId")
     public void validateUserId(Long senderId) {
+
         var id = (Long) SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getCredentials();

@@ -17,6 +17,7 @@ import javax.validation.groups.Default;
 @Builder
 @AllArgsConstructor
 public class MessageRequest {
+
     @NotNull(message = "Sender id property is missing")
     private Long senderId;
 
@@ -27,9 +28,11 @@ public class MessageRequest {
     private String content;
 
     public interface First {
+
     }
 
     @GroupSequence(value = {First.class, Default.class})
     public interface ValidationOrder {
+
     }
 }

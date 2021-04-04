@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(path = "/register")
 public class RegisterController {
+
     private final RegisterService registerService;
 
     @Autowired
     public RegisterController(RegisterService registerService) {
+
         this.registerService = registerService;
     }
 
@@ -24,6 +26,7 @@ public class RegisterController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public UserResponse register(@Validated({RegisterCredentialsRequest.ValidationOrder.class})
                                  @RequestBody RegisterCredentialsRequest credentials) {
+
         return registerService.register(credentials);
     }
 }

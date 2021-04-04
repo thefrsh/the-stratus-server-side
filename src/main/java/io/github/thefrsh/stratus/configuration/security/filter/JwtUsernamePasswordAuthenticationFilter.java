@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.util.Date;
 
 public class JwtUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+
     private final ObjectMapper objectMapper;
     private final ServletExceptionResolver resolver;
     private final String jwtSecret;
@@ -31,6 +32,7 @@ public class JwtUsernamePasswordAuthenticationFilter extends UsernamePasswordAut
 
     public JwtUsernamePasswordAuthenticationFilter(ObjectMapper objectMapper, ServletExceptionResolver resolver,
                                                    String jwtSecret, int tokenExpirationTimeInDays) {
+
         this.objectMapper = objectMapper;
         this.resolver = resolver;
         this.jwtSecret = jwtSecret;
@@ -39,7 +41,9 @@ public class JwtUsernamePasswordAuthenticationFilter extends UsernamePasswordAut
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
+
         try {
+
             var loginCredentials = objectMapper.readValue(request.getReader(), LoginCredentialsRequest.class);
 
             var authentication = new UsernamePasswordAuthenticationToken(
@@ -49,6 +53,7 @@ public class JwtUsernamePasswordAuthenticationFilter extends UsernamePasswordAut
             return getAuthenticationManager().authenticate(authentication);
         }
         catch (IOException exception) {
+
             try {
                 resolver.resolveException(request, response, new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "Incorrect body format, please provide username and password"));
@@ -64,6 +69,7 @@ public class JwtUsernamePasswordAuthenticationFilter extends UsernamePasswordAut
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
                                             Authentication authResult) throws IOException {
+
         var userDetails = (UserDetailsJpaAdapter) authResult.getPrincipal();
 
         var jwt = Jwts.builder()
@@ -81,6 +87,7 @@ public class JwtUsernamePasswordAuthenticationFilter extends UsernamePasswordAut
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                               AuthenticationException failed) throws IOException {
+
         resolver.resolveException(request, response, new ResponseStatusException(HttpStatus.UNAUTHORIZED,
                 failed.getMessage()));
     }

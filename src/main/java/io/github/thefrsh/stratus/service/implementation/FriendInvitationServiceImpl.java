@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 
 @Service
 public class FriendInvitationServiceImpl implements FriendInvitationService {
+
     private final FriendInvitationJpaRepository friendInvitationJpaRepository;
     private final UserService userService;
     private final WebSocketService webSocketService;
@@ -24,6 +25,7 @@ public class FriendInvitationServiceImpl implements FriendInvitationService {
     @Autowired
     public FriendInvitationServiceImpl(FriendInvitationJpaRepository friendInvitationJpaRepository,
                                        @Lazy UserService userService, WebSocketService webSocketService) {
+
         this.friendInvitationJpaRepository = friendInvitationJpaRepository;
         this.userService = userService;
         this.webSocketService = webSocketService;
@@ -32,6 +34,7 @@ public class FriendInvitationServiceImpl implements FriendInvitationService {
     @Override
     @Transactional
     public void inviteToFriends(Long senderId, Long receiverId) {
+
         var receiver = userService.findUser(receiverId);
 
         List.ofAll(receiver.getFriends())
@@ -66,12 +69,14 @@ public class FriendInvitationServiceImpl implements FriendInvitationService {
     @Override
     @Transactional
     public void removeInvitation(Long invitationId) {
+
         friendInvitationJpaRepository.deleteById(invitationId);
     }
 
     @Override
     @Transactional
     public void declineInvitation(Long userId, Long invitationId) {
+
         var user = userService.findUser(userId);
 
         List.ofAll(user.getReceivedInvitations())

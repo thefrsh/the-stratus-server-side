@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Value
 public class MessageTransfer {
+
     TransferType type;
 
     Long id;
@@ -20,6 +21,7 @@ public class MessageTransfer {
     @Builder
     public MessageTransfer(Long id, String sender, Long conversationId, String content, LocalDateTime sendTime,
                            MessageState messageState) {
+
         this.type = TransferType.CHAT_MESSAGE;
 
         this.id = id;

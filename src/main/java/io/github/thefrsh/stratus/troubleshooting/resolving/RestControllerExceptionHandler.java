@@ -17,9 +17,11 @@ import java.util.Objects;
 
 @RestControllerAdvice
 public class RestControllerExceptionHandler {
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Errors> handleMethodArgumentNotValidException(HttpServletRequest request,
                                                                         MethodArgumentNotValidException e) {
+
         var message = Objects.requireNonNull(e.getBindingResult()
                 .getFieldError())
                 .getDefaultMessage();
@@ -40,6 +42,7 @@ public class RestControllerExceptionHandler {
     @ExceptionHandler({NumberFormatException.class, HttpMessageNotReadableException.class,
             ConstraintViolationException.class})
     public ResponseEntity<Errors> handleNumberFormatException(HttpServletRequest request, Exception e) {
+
         var errors = Errors.builder()
                 .timestamp(new Date())
                 .status(HttpStatus.BAD_REQUEST)

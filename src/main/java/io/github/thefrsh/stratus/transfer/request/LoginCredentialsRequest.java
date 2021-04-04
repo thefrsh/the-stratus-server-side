@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class LoginCredentialsRequest {
+
     private String username;
     private String password;
 
@@ -17,6 +18,7 @@ public class LoginCredentialsRequest {
     @SuppressWarnings(value = "unused")
     public LoginCredentialsRequest(@JsonProperty(required = true) String username,
                                    @JsonProperty(required = true) String password) {
+
         this.username = username;
         this.password = password;
     }

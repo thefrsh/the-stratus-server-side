@@ -11,6 +11,7 @@ import io.github.thefrsh.stratus.transfer.response.UserResponse;
 import io.github.thefrsh.stratus.transfer.websocket.*;
 
 public interface TransferConversionService {
+
     UserResponse toUserResponse(User user);
 
     User toUser(RegisterCredentialsRequest credentialsRequest);

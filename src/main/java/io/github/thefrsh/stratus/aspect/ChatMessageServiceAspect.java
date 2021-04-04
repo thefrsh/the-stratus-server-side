@@ -14,16 +14,19 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 public class ChatMessageServiceAspect {
+
     private final UserService userService;
 
     @Autowired
     public ChatMessageServiceAspect(UserService userService) {
+
         this.userService = userService;
     }
 
     @Before(value = "execution(* io.github.thefrsh.stratus.service.implementation.ChatMessageServiceImpl." +
             "*(Long, Long)) && args(conversationId, messageId)", argNames = "conversationId, messageId")
     public void validateUpdateMessageState(Long conversationId, Long messageId) {
+
         var id = (Long) SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getCredentials();

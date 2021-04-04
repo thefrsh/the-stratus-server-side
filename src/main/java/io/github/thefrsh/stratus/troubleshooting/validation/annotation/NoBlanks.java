@@ -13,6 +13,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = NoBlanksValidator.class)
 public @interface NoBlanks {
+
     String message() default "There are white characters";
 
     Class<?>[] groups() default {};

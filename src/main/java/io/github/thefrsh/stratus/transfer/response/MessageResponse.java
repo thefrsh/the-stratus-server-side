@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MessageResponse {
+
     private Long id;
     private String content;
     private LocalDateTime sendTime;

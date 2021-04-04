@@ -10,9 +10,11 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 public class FriendInvitationServiceAspect {
+
     @Before(value = "execution(* io.github.thefrsh.stratus.service.implementation.FriendInvitationServiceImpl" +
             ".inviteToFriends(Long, Long)) && args(userId, friendId)", argNames = "userId, friendId")
     public void checkIfIdsAreDifferent(Long userId, Long friendId) {
+
         if (userId.equals(friendId)) {
             throw new IdConflictException("User ids are the same");
         }

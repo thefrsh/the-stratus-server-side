@@ -22,6 +22,7 @@ import java.util.List;
 
 @Service
 public class ConversationServiceImpl implements ConversationService {
+
     private final ConversationJpaRepository repository;
     private final WebSocketService webSocketService;
     private final TransferConversionService conversionService;
@@ -30,6 +31,7 @@ public class ConversationServiceImpl implements ConversationService {
     @Autowired
     public ConversationServiceImpl(ConversationJpaRepository repository, WebSocketService webSocketService,
                                    TransferConversionService conversionService, ChatMessageService chatMessageService) {
+
         this.repository = repository;
         this.webSocketService = webSocketService;
         this.conversionService = conversionService;
@@ -39,6 +41,7 @@ public class ConversationServiceImpl implements ConversationService {
     @Override
     @Transactional
     public Conversation createConversation(List<User> participants) {
+
         var conversation = new Conversation();
         conversation.setParticipants(participants);
 
@@ -48,6 +51,7 @@ public class ConversationServiceImpl implements ConversationService {
     @Override
     @Transactional
     public Conversation removeConversationBetween(List<User> participants, Long conversationId) {
+
         var conversation = findConversation(conversationId);
 
         if (!CollectionUtils.isEqualCollection(conversation.getParticipants(), participants)) {
@@ -63,6 +67,7 @@ public class ConversationServiceImpl implements ConversationService {
     @Override
     @Transactional
     public MessageResponse sendMessage(Long conversationId, Long senderId, String content) {
+
         var conversation = findConversation(conversationId);
 
         return io.vavr.collection.List.ofAll(conversation.getParticipants())
@@ -93,6 +98,7 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     private Conversation findConversation(Long id) {
+
         return repository.findById(id)
                 .getOrElseThrow(() -> new ConversationNotFoundException("Conversation with id " + id + " has not " +
                         "been found"));
